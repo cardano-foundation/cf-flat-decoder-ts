@@ -1,4 +1,6 @@
+import { decode } from "cbor-x";
 import { ConstantTypeTagFlat } from "../uplc/CommonFlatInstantces";
+import { toInt8Array, toUint8Array } from "../utils";
 
 export class Flat {}
 
@@ -56,7 +58,7 @@ export class FlatBigInt {
 }
 
 export class FlatArrayByte {
-  public static decode(decoder: DecoderState): Uint8Array {
+  public static decode(decoder: DecoderState): Int8Array {
     decoder.filler();
     let numElems = decoder.buffer[decoder.currPtr] & 0xff;
     let decoderOffset = numElems + 1;
@@ -69,7 +71,7 @@ export class FlatArrayByte {
       decoderOffset += numElems + 1;
     }
 
-    const result = new Uint8Array(size);
+    const result = new Int8Array(size);
     numElems = decoder.buffer[decoder.currPtr] & 0xff;
     decoder.currPtr += 1;
     let resultOffset = 0;
@@ -113,7 +115,8 @@ export class FlatUnit {
 }
 export class FlatData {
   public static decode(decoder: DecoderState) {
-    //TODO: Implement later
+    const bytes = FlatArrayByte.decode(decoder);
+    return toInt8Array(decode(toUint8Array(bytes)));
   }
 }
 
@@ -123,13 +126,13 @@ export const zagZig = (u: bigint): bigint => {
 
 export class DecoderState {
   /** The buffer that contains a sequence of flat-encoded values */
-  public buffer: Uint8Array;
+  public buffer: Int8Array;
   /** Pointer to the current byte being decoded (0..buffer.byteLength-1) */
   public currPtr: number = 0;
   /** Number of already decoded bits in the current byte (0..7) */
   public usedBits: number = 0;
 
-  constructor(buffer: Uint8Array) {
+  constructor(buffer: Int8Array) {
     this.buffer = buffer;
   }
 

@@ -27,7 +27,7 @@ export class Constant {
       return `integer ${this.value}`;
     }
     if (this.tpe instanceof ByteString) {
-      return `bytestring #${bytesToHex(this.value as Uint8Array)}`;
+      return `bytestring #${bytesToHex(this.value as Int8Array)}`;
     }
     if (this.tpe instanceof String) {
       return `string "${this.value}"`;
@@ -53,7 +53,7 @@ export class Constant {
 
 const HEX_ARRAY: string[] = "0123456789ABCDEF".split("");
 
-const bytesToHex = (bytes: Uint8Array): string => {
+const bytesToHex = (bytes: Int8Array): string => {
   const hexChars: string[] = new Array(bytes.length * 2);
   for (let j = 0; j < bytes.length; j++) {
     const v = bytes[j] & 0xff;

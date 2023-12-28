@@ -16,12 +16,9 @@ export class FlatDeBruijnedProgram {
     );
   }
 }
-export const LIST_TAG: number[] = [];
 export class FlatTerm {
   public static decode(decoder: DecoderState): Term {
     const tag = decoder.bits8(termTagWidth);
-
-    LIST_TAG.push(tag);
     switch (tag) {
       case 0: {
         const index = Number(FlatNatural.decode(decoder).n);

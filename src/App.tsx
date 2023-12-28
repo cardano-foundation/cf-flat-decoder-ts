@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { getUplc } from "./FlatDecoder";
 import { Term } from "./uplc/Term";
-import { LIST_TAG } from "./uplc/FlatInstantces";
 
 function App() {
   const [deserializeContract, setDeserializeContract] = useState(
@@ -13,7 +12,6 @@ function App() {
     const uplc = getUplc(deserializeContract);
     setUplc(uplc);
     Term.indent = 5; //Reset indent
-    console.log(LIST_TAG.join(" "));
   };
   return (
     <>

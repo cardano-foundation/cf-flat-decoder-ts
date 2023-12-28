@@ -15,7 +15,7 @@ const CONSTANT_WIDTH = 4;
 export class FlatConstant {
   public static decode(decoder: DecoderState): Constant {
     const tags = ListFlat.decode(decoder);
-    const tpe = decodeUni(tags);
+    const [tpe, _] = decodeUni(tags);
     let decoded: unknown;
     if (tpe instanceof Integer) {
       decoded = FlatBigInt.decode(decoder);
@@ -58,10 +58,9 @@ export class Bool extends DefaultUni {}
 export class ProtoList extends DefaultUni {}
 export class ProtoPair extends DefaultUni {}
 export class Data extends DefaultUni {}
-export class Default extends DefaultUni {}
 export class Apply extends DefaultUni {
-  f: DefaultUni = Default;
-  arg: DefaultUni = Default;
+  f?: DefaultUni;
+  arg?: DefaultUni;
 
   constructor(f: DefaultUni, arg: DefaultUni) {
     super();
@@ -70,35 +69,32 @@ export class Apply extends DefaultUni {
   }
 }
 
-function decodeUni(state: number[]): DefaultUni {
-  if (!state.length) return new Default();
-
-  const head = state[0];
-  switch (head) {
+type UniTuple = [DefaultUni, number[]];
+function decodeUni(state: number[]): UniTuple {
+  switch (state[0]) {
     case 0:
-      return new Integer();
+      return [new Integer(), state.slice(1)];
     case 1:
-      return new ByteString();
+      return [new ByteString(), state.slice(1)];
     case 2:
-      return new String();
+      return [new String(), state.slice(1)];
     case 3:
-      return new Unit();
+      return [new Unit(), state.slice(1)];
     case 4:
-      return new Bool();
+      return [new Bool(), state.slice(1)];
     case 5:
-      return new ProtoList();
+      return [new ProtoList(), state.slice(1)];
     case 6:
-      return new ProtoPair();
+      return [new ProtoPair(), state.slice(1)];
     case 7: {
-      const cloneState = [...state];
-      const uniF = decodeUni(cloneState);
-      const uniA = decodeUni(cloneState.slice(1));
-      return new Apply(uniF, uniA);
+      const [uniF, tail1] = decodeUni(state.slice(1));
+      const [uniA, tail2] = decodeUni(tail1);
+      return [new Apply(uniF, uniA), tail2];
     }
     case 8:
-      return new Data();
-    // default:
-    //   throw new Error(`Invalid uni: ${head}`);
+      return [new Data(), state.slice(1)];
+    default:
+      throw new Error(`Invalid uni: ${state[0]}`);
   }
 }
 
