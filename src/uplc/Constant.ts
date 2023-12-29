@@ -45,7 +45,7 @@ export class Constant {
       return `protoPair ${this.value}`;
     }
     if (this.tpe instanceof Data) {
-      return `data ${this.value}`;
+      return `data #${bytesToHex(this.value as Int8Array)}`;
     }
     return "";
   }

@@ -15,32 +15,39 @@ const CONSTANT_WIDTH = 4;
 export class FlatConstant {
   public static decode(decoder: DecoderState): Constant {
     const tags = ListFlat.decode(decoder);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [tpe, _] = decodeUni(tags);
-    let decoded: unknown;
-    if (tpe instanceof Integer) {
-      decoded = FlatBigInt.decode(decoder);
-    }
-    if (tpe instanceof ByteString) {
-      decoded = FlatArrayByte.decode(decoder);
-    }
-    if (tpe instanceof String) {
-      decoded = FlatString.decode(decoder);
-    }
-    if (tpe instanceof Unit) {
-      decoded = FlatUnit.decode(decoder);
-    }
-    if (tpe instanceof Bool) {
-      decoded = FlatBoolean.decode(decoder);
-    }
-    if (tpe instanceof Data) {
-      decoded = FlatData.decode(decoder);
-    }
-
+    const uniDecoder = flatForUni(tpe);
+    const decoded = uniDecoder?.decode(decoder);
     const result = Constant.fromValue(tpe, decoded);
 
     return result;
   }
 }
+
+export const flatForUni = (tpe: DefaultUni) => {
+  if (tpe instanceof Integer) {
+    return FlatBigInt;
+  }
+  if (tpe instanceof ByteString) {
+    return FlatArrayByte;
+  }
+  if (tpe instanceof String) {
+    return FlatString;
+  }
+  if (tpe instanceof Unit) {
+    return FlatUnit;
+  }
+  if (tpe instanceof Bool) {
+    return FlatBoolean;
+  }
+  if (tpe instanceof Data) {
+    return FlatData;
+  }
+  // if (tpe instanceof Apply && tpe.f instanceof ProtoList && tpe.arg) {
+  //   return flatForUni(tpe.arg);
+  // }
+};
 
 export class ConstantTypeTagFlat {
   public static decode(decode: DecoderState): number {

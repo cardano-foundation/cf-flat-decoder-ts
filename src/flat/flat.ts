@@ -1,6 +1,4 @@
-import { decode } from "cbor-x";
 import { ConstantTypeTagFlat } from "../uplc/CommonFlatInstantces";
-import { toInt8Array, toUint8Array } from "../utils";
 
 export class Flat {}
 
@@ -116,7 +114,7 @@ export class FlatUnit {
 export class FlatData {
   public static decode(decoder: DecoderState) {
     const bytes = FlatArrayByte.decode(decoder);
-    return toInt8Array(decode(toUint8Array(bytes)));
+    return bytes;
   }
 }
 
