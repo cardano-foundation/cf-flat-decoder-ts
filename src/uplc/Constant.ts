@@ -5,21 +5,30 @@ import {
   String,
   Unit,
   Bool,
-  ProtoList,
   ProtoPair,
   Data,
 } from "./CommonFlatInstantces";
 
+export enum ApplyType {
+  ProtoList,
+  ProtoPair,
+}
 export class Constant {
-  public static fromValue(tpe: DefaultUni, decoded: unknown) {
-    return new Constant(tpe, decoded);
+  public static fromValue(
+    tpe: DefaultUni,
+    decoded: unknown,
+    applyType?: ApplyType
+  ) {
+    return new Constant(tpe, decoded, applyType);
   }
   public tpe?: DefaultUni;
   public value?: unknown;
+  public applyType?: ApplyType;
 
-  constructor(tpe: DefaultUni, value: unknown) {
+  constructor(tpe: DefaultUni, value: unknown, applyType?: ApplyType) {
     this.tpe = tpe;
     this.value = value;
+    this.applyType = applyType;
   }
 
   public pretty(): string {
@@ -38,8 +47,8 @@ export class Constant {
     if (this.tpe instanceof Bool) {
       return `bool ${this.value ? "True" : "False"}`;
     }
-    if (this.tpe instanceof ProtoList) {
-      return `protoList ${this.value}`;
+    if (this.applyType === ApplyType.ProtoList) {
+      return `(list ${this.value}) `;
     }
     if (this.tpe instanceof ProtoPair) {
       return `protoPair ${this.value}`;

@@ -8,18 +8,20 @@ import {
   FlatUnit,
   ListFlat,
 } from "../flat/flat";
-import { Constant } from "./Constant";
+import { ApplyType, Constant } from "./Constant";
 import { DefaultFun } from "./DefaultFun";
 const CONSTANT_WIDTH = 4;
 
 export class FlatConstant {
   public static decode(decoder: DecoderState): Constant {
-    const tags = ListFlat.decode(decoder);
+    const tags = new ListFlat<number>("ConstantTypeTagFlat").decode(decoder);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [tpe, _] = decodeUni(tags);
     const uniDecoder = flatForUni(tpe);
     const decoded = uniDecoder?.decode(decoder);
-    const result = Constant.fromValue(tpe, decoded);
+    const applyType =
+      uniDecoder instanceof ListFlat ? ApplyType.ProtoList : undefined;
+    const result = Constant.fromValue(tpe, decoded, applyType);
 
     return result;
   }
@@ -44,9 +46,13 @@ export const flatForUni = (tpe: DefaultUni) => {
   if (tpe instanceof Data) {
     return FlatData;
   }
-  // if (tpe instanceof Apply && tpe.f instanceof ProtoList && tpe.arg) {
-  //   return flatForUni(tpe.arg);
-  // }
+  if (tpe instanceof Apply && tpe.f instanceof ProtoList && tpe.arg) {
+    return new ListFlat(flatForUni(tpe.arg).toString());
+  }
+
+  if (tpe instanceof Apply && tpe.f instanceof ProtoPair && tpe.arg) {
+    //TODO: Implement later
+  }
 };
 
 export class ConstantTypeTagFlat {

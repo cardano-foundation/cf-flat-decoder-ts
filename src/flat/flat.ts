@@ -10,17 +10,6 @@ class Natural {
   }
 }
 
-export class ListFlat {
-  public static decode(decode: DecoderState): number[] {
-    const result = [];
-    while (decode.bits8(1) === 1) {
-      const a = ConstantTypeTagFlat.decode(decode);
-      result.push(a);
-    }
-    return result;
-  }
-}
-
 export class FlatNatural {
   public static decode(decoder: DecoderState): Natural {
     let w = decoder.bits8(8);
@@ -198,3 +187,45 @@ export class DecoderState {
     this.currPtr += Math.floor(totUsed / 8);
   }
 }
+
+export const FlatType = {
+  ConstantTypeTagFlat,
+  FlatNatural,
+  FlatBigInt,
+  FlatArrayByte,
+  FlatString,
+  FlatBoolean,
+  FlatUnit,
+  FlatData,
+};
+
+export type FlatTypeKey = keyof typeof FlatType;
+
+export class ListFlat<T> {
+  public decoder: any;
+
+  constructor(flatDecoder: FlatTypeKey) {
+    this.decoder = FlatType[flatDecoder];
+  }
+  public decode(decode: DecoderState): T[] {
+    const result: T[] = [];
+    while (decode.bits8(1) === 1) {
+      const a = this.decoder.decode(decode);
+      result.push(a as T);
+    }
+    return result;
+  }
+}
+
+// export const listFlat = <T>(flatDecoder: FlatTypeKey) => {
+//   const decoder = FlatType[flatDecoder];
+//   const decode = (decode: DecoderState): T[] => {
+//     const result: T[] = [];
+//     while (decode.bits8(1) === 1) {
+//       const a = decoder.decode(decode);
+//       result.push(a as T);
+//     }
+//     return result;
+//   };
+//   return decode;
+// };
