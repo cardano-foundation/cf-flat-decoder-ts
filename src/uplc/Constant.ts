@@ -8,6 +8,7 @@ import {
   Bool,
   ProtoPair,
   Data,
+  ProtoList,
 } from "./CommonFlatInstantces";
 
 export enum ApplyType {
@@ -15,48 +16,48 @@ export enum ApplyType {
   ProtoPair,
 }
 export class Constant {
-  public static fromValue(
-    tpe: DefaultUni,
-    decoded: unknown,
-    applyType?: ApplyType
-  ) {
-    return new Constant(tpe, decoded, applyType);
+  public static fromValue(tpe: DefaultUni, decoded: unknown) {
+    return new Constant(tpe, decoded);
   }
   public tpe?: DefaultUni;
   public value?: unknown;
-  public applyType?: ApplyType;
 
-  constructor(tpe: DefaultUni, value: unknown, applyType?: ApplyType) {
+  constructor(tpe: DefaultUni, value: unknown) {
     this.tpe = tpe;
     this.value = value;
-    this.applyType = applyType;
+  }
+
+  public prettyValue(c: DefaultUni): string {
+    if (c instanceof Integer) {
+      return `${this.value}`;
+    }
+    if (c instanceof ByteString) {
+      return `#${bytesToHex(this.value as Int8Array)}`;
+    }
+    if (c instanceof String) {
+      return `"${this.value}"`;
+    }
+    if (c instanceof Unit) {
+      return `${this.value}`;
+    }
+    if (c instanceof Bool) {
+      return this.value ? "True" : "False";
+    }
+    if (c instanceof ProtoList) {
+      return `[${(this.value as Array<Constant>)
+        .map((v) => this.prettyValue(v))
+        .join(", ")}]`;
+    }
+    if (c instanceof ProtoPair) {
+      return `${this.value}`;
+    }
+    if (c instanceof Data) {
+      return `#${bytesToHex(this.value as Int8Array)}`;
+    }
+    return "";
   }
 
   public pretty(): string {
-    if (this.tpe instanceof Integer) {
-      return `integer ${this.value}`;
-    }
-    if (this.tpe instanceof ByteString) {
-      return `bytestring #${bytesToHex(this.value as Int8Array)}`;
-    }
-    if (this.tpe instanceof String) {
-      return `string "${this.value}"`;
-    }
-    if (this.tpe instanceof Unit) {
-      return `unit ${this.value}`;
-    }
-    if (this.tpe instanceof Bool) {
-      return `bool ${this.value ? "True" : "False"}`;
-    }
-    if (this.applyType === ApplyType.ProtoList) {
-      return `(list ${this.value}) `;
-    }
-    if (this.tpe instanceof ProtoPair) {
-      return `protoPair ${this.value}`;
-    }
-    if (this.tpe instanceof Data) {
-      return `data #${bytesToHex(this.value as Int8Array)}`;
-    }
-    return "";
+    return `${DefaultUni.pretty(this.tpe!)} ${this.prettyValue(this.tpe!)}`;
   }
 }

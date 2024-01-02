@@ -9,7 +9,7 @@ import {
   FlatUnit,
   ListFlat,
 } from "../flat/flat";
-import { ApplyType, Constant } from "./Constant";
+import { Constant } from "./Constant";
 import { DefaultFun } from "./DefaultFun";
 const CONSTANT_WIDTH = 4;
 
@@ -23,13 +23,14 @@ export class FlatConstant extends Flat<Constant> {
     const tags = new ListFlat<number>(ConstantTypeTagFlat.getInstance()).decode(
       decoder
     );
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [tpe, _] = decodeUni(tags);
+    let tpe = decodeUni(tags)[0];
     const uniDecoder = flatForUni(tpe);
     const decoded = uniDecoder?.decode(decoder);
-    const applyType =
-      uniDecoder instanceof ListFlat ? ApplyType.ProtoList : undefined;
-    const result = Constant.fromValue(tpe, decoded, applyType);
+    if (uniDecoder instanceof ListFlat) {
+      const protoList = tpe as ProtoList;
+      tpe = new ProtoList(protoList.f, protoList.arg);
+    }
+    const result = Constant.fromValue(tpe, decoded);
 
     return result;
   }
@@ -59,7 +60,7 @@ export const flatForUni = (tpe: DefaultUni): Flat<unknown> | undefined => {
   }
 
   if (tpe instanceof Apply && tpe.f instanceof ProtoPair && tpe.arg) {
-    //TODO: Implement later
+    //TODO: Protopair will be implemented later
   }
 };
 
@@ -75,26 +76,55 @@ export class ConstantTypeTagFlat extends Flat<number> {
   }
 }
 
-export class DefaultUni {}
+export class DefaultUni {
+  public static pretty(du: DefaultUni): string {
+    if (du instanceof Integer) {
+      return `integer`;
+    }
+    if (du instanceof ByteString) {
+      return `bytestring`;
+    }
+    if (du instanceof String) {
+      return `string`;
+    }
+    if (du instanceof Unit) {
+      return `unit`;
+    }
+    if (du instanceof Bool) {
+      return `bool`;
+    }
+    if (du instanceof ProtoList) {
+      return `(list ${this.pretty((du as Apply).arg!)})`;
+    }
+    if (du instanceof ProtoPair) {
+      return `(pair )`;
+    }
+    if (du instanceof Data) {
+      return `data`;
+    }
+    return "";
+  }
+}
 
 export class Integer extends DefaultUni {}
 export class ByteString extends DefaultUni {}
 export class String extends DefaultUni {}
 export class Unit extends DefaultUni {}
 export class Bool extends DefaultUni {}
-export class ProtoList extends DefaultUni {}
-export class ProtoPair extends DefaultUni {}
 export class Data extends DefaultUni {}
 export class Apply extends DefaultUni {
   f?: DefaultUni;
   arg?: DefaultUni;
 
-  constructor(f: DefaultUni, arg: DefaultUni) {
+  constructor(f?: DefaultUni, arg?: DefaultUni) {
     super();
     this.f = f;
     this.arg = arg;
   }
 }
+
+export class ProtoList extends Apply {}
+export class ProtoPair extends Apply {}
 
 type UniTuple = [DefaultUni, number[]];
 function decodeUni(state: number[]): UniTuple {
