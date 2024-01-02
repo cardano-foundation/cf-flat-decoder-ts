@@ -1,3 +1,4 @@
+import { bytesToHex } from "../utils";
 import {
   ByteString,
   DefaultUni,
@@ -59,15 +60,3 @@ export class Constant {
     return "";
   }
 }
-
-const HEX_ARRAY: string[] = "0123456789ABCDEF".split("");
-
-const bytesToHex = (bytes: Int8Array): string => {
-  const hexChars: string[] = new Array(bytes.length * 2);
-  for (let j = 0; j < bytes.length; j++) {
-    const v = bytes[j] & 0xff;
-    hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-    hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0f];
-  }
-  return hexChars.join("");
-};

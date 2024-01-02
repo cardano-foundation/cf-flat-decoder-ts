@@ -1,6 +1,6 @@
-import { ConstantTypeTagFlat } from "../uplc/CommonFlatInstantces";
-
-export class Flat {}
+export abstract class Flat<T> {
+  public abstract decode(decoder: DecoderState): T;
+}
 
 class Natural {
   public n: bigint;
@@ -10,8 +10,13 @@ class Natural {
   }
 }
 
-export class FlatNatural {
-  public static decode(decoder: DecoderState): Natural {
+export class FlatNatural extends Flat<Natural> {
+  private static readonly instance = new FlatNatural();
+
+  public static getInstance() {
+    return FlatNatural.instance;
+  }
+  public decode(decoder: DecoderState): Natural {
     let w = decoder.bits8(8);
     let r = BigInt(0);
     let shl = 0;
@@ -27,8 +32,13 @@ export class FlatNatural {
   }
 }
 
-export class FlatBigInt {
-  public static decode(decoder: DecoderState): bigint {
+export class FlatBigInt extends Flat<bigint> {
+  private static readonly instance = new FlatBigInt();
+
+  public static getInstance() {
+    return FlatBigInt.instance;
+  }
+  public decode(decoder: DecoderState): bigint {
     let w = decoder.bits8(8);
     let r = BigInt(0);
     let shl = 0;
@@ -44,8 +54,13 @@ export class FlatBigInt {
   }
 }
 
-export class FlatArrayByte {
-  public static decode(decoder: DecoderState): Int8Array {
+export class FlatArrayByte extends Flat<Int8Array> {
+  private static readonly instance = new FlatArrayByte();
+
+  public static getInstance() {
+    return FlatArrayByte.instance;
+  }
+  public decode(decoder: DecoderState): Int8Array {
     decoder.filler();
     let numElems = decoder.buffer[decoder.currPtr] & 0xff;
     let decoderOffset = numElems + 1;
@@ -80,29 +95,49 @@ export class FlatArrayByte {
   }
 }
 
-export class FlatString {
-  public static decode(decoder: DecoderState): string {
-    const bytes = FlatArrayByte.decode(decoder);
+export class FlatString extends Flat<string> {
+  private static readonly instance = new FlatString();
+
+  public static getInstance() {
+    return FlatString.instance;
+  }
+  public decode(decoder: DecoderState): string {
+    const bytes = FlatArrayByte.getInstance().decode(decoder);
     return new TextDecoder("UTF-8").decode(bytes);
   }
 }
 
-export class FlatBoolean {
-  public static decode(decoder: DecoderState): boolean {
+export class FlatBoolean extends Flat<boolean> {
+  private static readonly instance = new FlatBoolean();
+
+  public static getInstance() {
+    return FlatBoolean.instance;
+  }
+  public decode(decoder: DecoderState): boolean {
     const decoded = decoder.bits8(1);
     return decoded === 1;
   }
 }
 
-export class FlatUnit {
-  public static decode(decoder: DecoderState): string {
-    if (decoder) return "()";
-    return "";
+export class FlatUnit extends Flat<string> {
+  private static readonly instance = new FlatUnit();
+
+  public static getInstance() {
+    return FlatUnit.instance;
+  }
+  public decode(decoder: DecoderState): string {
+    return decoder ? "()" : "";
   }
 }
-export class FlatData {
-  public static decode(decoder: DecoderState) {
-    const bytes = FlatArrayByte.decode(decoder);
+export class FlatData extends Flat<Int8Array> {
+  private static readonly instance = new FlatData();
+
+  public static getInstance() {
+    return FlatData.instance;
+  }
+
+  public decode(decoder: DecoderState): Int8Array {
+    const bytes = FlatArrayByte.getInstance().decode(decoder);
     return bytes;
   }
 }
@@ -188,24 +223,11 @@ export class DecoderState {
   }
 }
 
-export const FlatType = {
-  ConstantTypeTagFlat,
-  FlatNatural,
-  FlatBigInt,
-  FlatArrayByte,
-  FlatString,
-  FlatBoolean,
-  FlatUnit,
-  FlatData,
-};
-
-export type FlatTypeKey = keyof typeof FlatType;
-
 export class ListFlat<T> {
-  public decoder: any;
+  public decoder: Flat<T>;
 
-  constructor(flatDecoder: FlatTypeKey) {
-    this.decoder = FlatType[flatDecoder];
+  constructor(flat: Flat<T>) {
+    this.decoder = flat;
   }
   public decode(decode: DecoderState): T[] {
     const result: T[] = [];
@@ -216,16 +238,3 @@ export class ListFlat<T> {
     return result;
   }
 }
-
-// export const listFlat = <T>(flatDecoder: FlatTypeKey) => {
-//   const decoder = FlatType[flatDecoder];
-//   const decode = (decode: DecoderState): T[] => {
-//     const result: T[] = [];
-//     while (decode.bits8(1) === 1) {
-//       const a = decoder.decode(decode);
-//       result.push(a as T);
-//     }
-//     return result;
-//   };
-//   return decode;
-// };

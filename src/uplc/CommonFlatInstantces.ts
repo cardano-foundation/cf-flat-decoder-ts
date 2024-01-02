@@ -1,5 +1,6 @@
 import {
   DecoderState,
+  Flat,
   FlatArrayByte,
   FlatBigInt,
   FlatBoolean,
@@ -12,9 +13,16 @@ import { ApplyType, Constant } from "./Constant";
 import { DefaultFun } from "./DefaultFun";
 const CONSTANT_WIDTH = 4;
 
-export class FlatConstant {
-  public static decode(decoder: DecoderState): Constant {
-    const tags = new ListFlat<number>("ConstantTypeTagFlat").decode(decoder);
+export class FlatConstant extends Flat<Constant> {
+  private static readonly instance = new FlatConstant();
+
+  public static getInstance() {
+    return FlatConstant.instance;
+  }
+  public decode(decoder: DecoderState): Constant {
+    const tags = new ListFlat<number>(ConstantTypeTagFlat.getInstance()).decode(
+      decoder
+    );
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [tpe, _] = decodeUni(tags);
     const uniDecoder = flatForUni(tpe);
@@ -27,27 +35,27 @@ export class FlatConstant {
   }
 }
 
-export const flatForUni = (tpe: DefaultUni) => {
+export const flatForUni = (tpe: DefaultUni): Flat<unknown> | undefined => {
   if (tpe instanceof Integer) {
-    return FlatBigInt;
+    return FlatBigInt.getInstance();
   }
   if (tpe instanceof ByteString) {
-    return FlatArrayByte;
+    return FlatArrayByte.getInstance();
   }
   if (tpe instanceof String) {
-    return FlatString;
+    return FlatString.getInstance();
   }
   if (tpe instanceof Unit) {
-    return FlatUnit;
+    return FlatUnit.getInstance();
   }
   if (tpe instanceof Bool) {
-    return FlatBoolean;
+    return FlatBoolean.getInstance();
   }
   if (tpe instanceof Data) {
-    return FlatData;
+    return FlatData.getInstance();
   }
   if (tpe instanceof Apply && tpe.f instanceof ProtoList && tpe.arg) {
-    return new ListFlat(flatForUni(tpe.arg).toString());
+    return new ListFlat(flatForUni(tpe.arg)!);
   }
 
   if (tpe instanceof Apply && tpe.f instanceof ProtoPair && tpe.arg) {
@@ -55,8 +63,14 @@ export const flatForUni = (tpe: DefaultUni) => {
   }
 };
 
-export class ConstantTypeTagFlat {
-  public static decode(decode: DecoderState): number {
+export class ConstantTypeTagFlat extends Flat<number> {
+  private static readonly instance = new ConstantTypeTagFlat();
+
+  public static getInstance() {
+    return ConstantTypeTagFlat.instance;
+  }
+
+  public decode(decode: DecoderState): number {
     return decode.bits8(CONSTANT_WIDTH);
   }
 }
@@ -111,8 +125,13 @@ function decodeUni(state: number[]): UniTuple {
   }
 }
 
-export class FlatDefaultFun {
-  public static decode(decode: DecoderState): string {
+export class FlatDefaultFun extends Flat<string> {
+  private static readonly instance = new FlatDefaultFun();
+
+  public static getInstance() {
+    return FlatDefaultFun.instance;
+  }
+  public decode(decode: DecoderState): string {
     const code = decode.bits8(7);
     switch (code) {
       case 0:

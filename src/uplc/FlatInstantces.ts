@@ -6,9 +6,9 @@ export const termTagWidth = 4;
 
 export class FlatDeBruijnedProgram {
   public static decode(decoder: DecoderState): DeBruijnedProgram {
-    const v1 = Number(FlatNatural.decode(decoder).n);
-    const v2 = Number(FlatNatural.decode(decoder).n);
-    const v3 = Number(FlatNatural.decode(decoder).n);
+    const v1 = Number(FlatNatural.getInstance().decode(decoder).n);
+    const v2 = Number(FlatNatural.getInstance().decode(decoder).n);
+    const v3 = Number(FlatNatural.getInstance().decode(decoder).n);
     const term = FlatTerm.decode(decoder);
     return new DeBruijnedProgram(
       { major: v1, minor: v2, patch: v3 } as Version,
@@ -21,7 +21,7 @@ export class FlatTerm {
     const tag = decoder.bits8(termTagWidth);
     switch (tag) {
       case 0: {
-        const index = Number(FlatNatural.decode(decoder).n);
+        const index = Number(FlatNatural.getInstance().decode(decoder).n);
         const name: string = `i${index}`;
         return Term.Var(new NamedDeBruijn(name, index));
       }
@@ -39,7 +39,7 @@ export class FlatTerm {
         return Term.Apply(f, arg);
       }
       case 4:
-        return Term.Const(FlatConstant.decode(decoder));
+        return Term.Const(FlatConstant.getInstance().decode(decoder));
       case 5: {
         const term = FlatTerm.decode(decoder);
         return Term.Force(term);
@@ -47,7 +47,9 @@ export class FlatTerm {
       case 6:
         return Term.Error();
       case 7:
-        return Term.Builtin(FlatDefaultFun.decode(decoder));
+        return Term.Builtin(FlatDefaultFun.getInstance().decode(decoder));
+      default:
+        throw new Error(`Not found tag: ${tag}`);
     }
   }
 }
