@@ -8,7 +8,6 @@ export const getUplc = (deserializeContract: string) => {
   const scriptFlat: Uint8Array = decode(hexToUint8Array(deserializeContract));
   const decoder: Int8Array = toInt8Array(scriptFlat);
 
-  console.log("decoder: ", decoder.join(" "));
   const program = ProgramFlatCodec.decodeFlat(decoder);
   return program.pretty();
 };

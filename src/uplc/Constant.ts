@@ -58,6 +58,7 @@ export class Constant {
   }
 
   public pretty(): string {
-    return `${DefaultUni.pretty(this.tpe!)} ${this.prettyValue(this.tpe!)}`;
+    if (!this.tpe) return "";
+    return `${DefaultUni.pretty(this.tpe)} ${this.prettyValue(this.tpe)}`;
   }
 }

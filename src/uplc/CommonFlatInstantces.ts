@@ -94,10 +94,10 @@ export class DefaultUni {
       return `bool`;
     }
     if (du instanceof ProtoList) {
-      return `(list ${this.pretty((du as Apply).arg!)})`;
+      return `(list ${du.arg && this.pretty(du.arg)})`;
     }
     if (du instanceof ProtoPair) {
-      return `(pair )`;
+      return `(pair)`; //TODO: Implement later
     }
     if (du instanceof Data) {
       return `data`;
