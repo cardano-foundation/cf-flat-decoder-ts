@@ -10,8 +10,3 @@ export const decodeFlatUplc = (deserializeContract: string) => {
   const program = ProgramFlatCodec.decodeFlat(decoder);
   return program.pretty();
 };
-
-export * from './src/uplc/codec';
-export * from './src/uplc/instances';
-export * from './src/uplc/term';
-export * from './src/uplc/utils';
