@@ -103,7 +103,7 @@ export class FlatString extends Flat<string> {
   }
   public decode(decoder: DecoderState): string {
     const bytes = FlatArrayByte.getInstance().decode(decoder);
-    return new TextDecoder("UTF-8").decode(bytes);
+    return new TextDecoder('UTF-8').decode(bytes);
   }
 }
 
@@ -126,7 +126,7 @@ export class FlatUnit extends Flat<string> {
     return FlatUnit.instance;
   }
   public decode(decoder: DecoderState): string {
-    return decoder ? "()" : "";
+    return decoder ? '()' : '';
   }
 }
 export class FlatData extends Flat<Int8Array> {
@@ -143,7 +143,7 @@ export class FlatData extends Flat<Int8Array> {
 }
 
 export const zagZig = (u: bigint): bigint => {
-  return (u >> 1n) ^ -(u & 1n);
+  return (u >> BigInt('1')) ^ -(u & BigInt('1'));
 };
 
 export class DecoderState {
@@ -163,7 +163,7 @@ export class DecoderState {
       this.usedBits
     }, buffer:[${Array.from(this.buffer)
       .map((byte) => byte.toString())
-      .join(", ")}])`;
+      .join(', ')}])`;
   }
 
   /** Decode up to 8 bits
@@ -172,7 +172,7 @@ export class DecoderState {
    */
   bits8(numBits: number): number {
     if (numBits < 0 || numBits > 8) {
-      throw new Error("Decoder.bits8: incorrect value of numBits " + numBits);
+      throw new Error('Decoder.bits8: incorrect value of numBits ' + numBits);
     }
 
     this.ensureBits(numBits);
@@ -202,7 +202,7 @@ export class DecoderState {
   private ensureBits(requiredBits: number): void {
     if (requiredBits > this.availableBits()) {
       throw new Error(
-        "DecoderState: Not enough data available: " + this.toString()
+        'DecoderState: Not enough data available: ' + this.toString()
       );
     }
   }

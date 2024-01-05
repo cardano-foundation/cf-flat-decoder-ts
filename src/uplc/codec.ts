@@ -1,6 +1,5 @@
-import { DecoderState } from "../flat/flat";
-import { FlatDeBruijnedProgram } from "./FlatInstantces";
-import { DeBruijnedProgram } from "./Term";
+import { DecoderState } from '../flat/flat';
+import { DeBruijnedProgram, FlatDeBruijnedProgram } from './term';
 
 export class ProgramFlatCodec {
   public static decodeFlat(encoded: Int8Array): DeBruijnedProgram {

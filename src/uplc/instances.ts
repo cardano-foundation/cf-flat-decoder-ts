@@ -8,9 +8,8 @@ import {
   FlatString,
   FlatUnit,
   ListFlat,
-} from "../flat/flat";
-import { Constant } from "./Constant";
-import { DefaultFun } from "./DefaultFun";
+} from '../flat/flat';
+import { Constant, DefaultFun } from './utils';
 const CONSTANT_WIDTH = 4;
 
 export class FlatConstant extends Flat<Constant> {
@@ -102,7 +101,7 @@ export class DefaultUni {
     if (du instanceof Data) {
       return `data`;
     }
-    return "";
+    return '';
   }
 }
 

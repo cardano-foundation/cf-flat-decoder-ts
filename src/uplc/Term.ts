@@ -1,4 +1,6 @@
-import { Constant } from "./Constant";
+import { Constant } from './utils';
+import { DecoderState, FlatNatural } from '../flat/flat';
+import { FlatConstant, FlatDefaultFun } from './instances';
 
 export class NamedDeBruijn {
   name: string;
@@ -6,7 +8,7 @@ export class NamedDeBruijn {
 
   constructor(name: string, index: number = 0) {
     if (index < 0) {
-      throw new Error("Index must be non-negative.");
+      throw new Error('Index must be non-negative.');
     }
 
     this.name = name;
@@ -33,7 +35,6 @@ export enum TermType {
   Error,
 }
 
-// Định nghĩa lớp Term với các trường tương ứng với enum Term
 export class Term {
   type?: TermType;
   name?: NamedDeBruijn;
@@ -100,23 +101,17 @@ export class Term {
     return errorTerm;
   }
 
-  public static indent = 5;
-  public static readonly INCREA_INDENT = 3;
-
   public pretty(): string | undefined {
     switch (this.type) {
       case TermType.Var: {
-        const name = this.name ? this.name.name : "";
+        const name = this.name ? this.name.name : '';
         return name;
       }
       case TermType.LamAbs: {
-        return `(lam ${
-          this.name?.name
-        }<br/><span style='margin-left:${(Term.indent +=
-          Term.INCREA_INDENT)}px'>${this.term?.pretty()}</span>)`;
+        return `  (lam ${this.name?.name} ${this.term?.pretty()}`;
       }
       case TermType.Apply: {
-        return `[${this.f?.pretty()} ${this.arg?.pretty()}]`;
+        return `[ ${this.f?.pretty()} ${this.arg?.pretty()} ]`;
       }
       case TermType.Force: {
         return `(force ${this.term?.pretty()})`;
@@ -154,6 +149,58 @@ export class DeBruijnedProgram {
 
   public pretty() {
     const { major, minor, patch } = this.version;
-    return `(program ${major}.${minor}.${patch} ${this.term.pretty()})`;
+    return `(program\n  ${major}.${minor}.${patch}\n${this.term.pretty()})`;
+  }
+}
+
+export const termTagWidth = 4;
+
+export class FlatDeBruijnedProgram {
+  public static decode(decoder: DecoderState): DeBruijnedProgram {
+    const v1 = Number(FlatNatural.getInstance().decode(decoder).n);
+    const v2 = Number(FlatNatural.getInstance().decode(decoder).n);
+    const v3 = Number(FlatNatural.getInstance().decode(decoder).n);
+    const term = FlatTerm.decode(decoder);
+    return new DeBruijnedProgram(
+      { major: v1, minor: v2, patch: v3 } as Version,
+      term
+    );
+  }
+}
+export class FlatTerm {
+  public static decode(decoder: DecoderState): Term {
+    const tag = decoder.bits8(termTagWidth);
+    switch (tag) {
+      case 0: {
+        const index = Number(FlatNatural.getInstance().decode(decoder).n);
+        const name: string = `i_${index}`;
+        return Term.Var(new NamedDeBruijn(name, index));
+      }
+      case 1: {
+        const term = FlatTerm.decode(decoder);
+        return Term.Delay(term);
+      }
+      case 2: {
+        const term = FlatTerm.decode(decoder);
+        return Term.LamAbs('i_0', term);
+      }
+      case 3: {
+        const f = FlatTerm.decode(decoder);
+        const arg = FlatTerm.decode(decoder);
+        return Term.Apply(f, arg);
+      }
+      case 4:
+        return Term.Const(FlatConstant.getInstance().decode(decoder));
+      case 5: {
+        const term = FlatTerm.decode(decoder);
+        return Term.Force(term);
+      }
+      case 6:
+        return Term.Error();
+      case 7:
+        return Term.Builtin(FlatDefaultFun.getInstance().decode(decoder));
+      default:
+        throw new Error(`Not found tag: ${tag}`);
+    }
   }
 }
