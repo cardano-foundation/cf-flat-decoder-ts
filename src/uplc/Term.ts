@@ -108,7 +108,7 @@ export class Term {
         return name;
       }
       case TermType.LamAbs: {
-        return `  (lam ${this.name?.name} ${this.term?.pretty()}`;
+        return `  (lam ${this.name?.name} ${this.term?.pretty()})`;
       }
       case TermType.Apply: {
         return `[ ${this.f?.pretty()} ${this.arg?.pretty()} ]`;
@@ -149,7 +149,7 @@ export class DeBruijnedProgram {
 
   public pretty() {
     const { major, minor, patch } = this.version;
-    return `(program\n  ${major}.${minor}.${patch}\n${this.term.pretty()})`;
+    return `(program\n  ${major}.${minor}.${patch}\n${this.term.pretty()}\n)`;
   }
 }
 

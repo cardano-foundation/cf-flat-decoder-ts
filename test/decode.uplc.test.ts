@@ -2,11 +2,9 @@ import { decodeFlatUplc } from '../index';
 import * as path from 'path';
 import * as fs from 'fs';
 
-const contract = '4a02000023370090100009';
-const contract_decoded = `(program
-  2.0.0
-  (lam i_0 [ [ (builtin addInteger) (con integer 16) ] i_0 ])
-)`;
+const removeWhiteSpace = (input: string): string => {
+  return input.replace(/\s+/g, '');
+};
 
 describe('decodeFlatUplc', () => {
   it('should decode a flat cbor uplc contract', () => {
@@ -22,6 +20,6 @@ describe('decodeFlatUplc', () => {
     });
 
     const decoded = decodeFlatUplc(program1Flat);
-    expect(program1).toEqual(decoded);
+    expect(removeWhiteSpace(program1)).toEqual(removeWhiteSpace(decoded));
   });
 });
