@@ -1,7 +1,7 @@
 import { decode } from 'cbor-x';
-import { ProgramFlatCodec } from './src/uplc/codec';
+import { ProgramFlatCodec } from './src/uplc/codecs';
 import { hexToUint8Array, toInt8Array } from './src/uplc/utils';
-import { DeBruijnedProgram, Version, fromDeBruijnTerm } from './src/uplc/term';
+import { DeBruijnedProgram, Version, fromDeBruijnTerm } from './src/uplc/terms';
 
 export const decodeFlatUplc = (
   deserializeContract: string,
