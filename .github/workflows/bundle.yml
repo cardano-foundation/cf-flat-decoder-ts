@@ -37,7 +37,6 @@ jobs:
         run: |
           mv dist/index.js ${{ env.VERSION }}/index.js
           mv dist/index.js.map ${{ env.VERSION }}/index.js.map
-          mv dist/index.js.LICENSE.txt ${{ env.VERSION }}/index.js.LICENSE.txt
 
       - name: 📅 Publish latest version on gh-pages
         uses: JamesIves/github-pages-deploy-action@v4
