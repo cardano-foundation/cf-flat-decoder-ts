@@ -19,7 +19,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "webpack && tsc --emitDeclarationOnly",
-    "test": "jest"
+    "test": "jest",
+    "test:ci": "jest --ci --coverage"
   },
   "dependencies": {
     "@types/jest": "^29.5.11",

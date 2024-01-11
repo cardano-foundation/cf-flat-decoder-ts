@@ -15,11 +15,13 @@ jobs:
         with:
           node-version: 16
 
-      - name: 📂 List files
-        run: ls -R
-
       - name: 🧘‍♀️ Download dependencies
         run: npm ci
 
       - name: 🎳 Run tests
-        run: npm test
+        run: npm run test:ci
+
+      - name: 🐝 Generating coverage badges
+        uses: jpb06/jest-badges-action@latest
+          with:
+            branches: main
