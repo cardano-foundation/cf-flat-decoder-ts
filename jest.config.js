@@ -1,5 +1,6 @@
 module.exports = {
   roots: ['./test'],
+  moduleDirectories: ['node_modules', 'src'],
   testMatch: [
     '**/__tests__/**/*.+(ts|tsx|js)',
     '**/?(*.)+(spec|test).+(ts|tsx|js)',
