@@ -1,7 +1,10 @@
 # Typescript Flat Decoder
 
 <p align="left">
-<img alt="Release" src="https://github.com/cardano-foundation/cf-adahandle-resolver/actions/workflows/release.yaml/badge.svg?branch=main" />
+<img alt="Tests" src="https://github.com/cardano-foundation/cf-flat-decoder-ts/actions/workflows/tests.yaml/badge.svg?branch=main" />
+<img alt="Coverage" src="https://cardano-foundation.github.io/cf-flat-decoder-ts/coverage-report/coverage-jest%20coverage.svg" />
+<img alt="Release" src="https://github.com/cardano-foundation/cf-flat-decoder-ts/actions/workflows/release.yaml/badge.svg?branch=main" />
+<img alt="Publish" src="https://github.com/cardano-foundation/cf-flat-decoder-ts/actions/workflows/publish.yaml/badge.svg?branch=main" />
 <a href="https://conventionalcommits.org"><img alt="conventionalcommits" src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits" /></a>
 <a href="https://discord.gg/4WVNHgQ7bP"><img alt="Discord" src="https://img.shields.io/discord/1022471509173882950"></a>
 </p>
