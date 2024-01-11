@@ -1,8 +1,7 @@
 import { decode } from 'cbor-x';
 import { ProgramFlatCodec } from './src/uplc/codec';
 import { hexToUint8Array, toInt8Array } from './src/uplc/utils';
-import { DeBruijnedProgram, Version } from './src/uplc/term';
-import { DeBruijn } from './src/uplc/DeBruijn';
+import { DeBruijnedProgram, Version, fromDeBruijnTerm } from './src/uplc/term';
 
 export const decodeFlatUplc = (
   deserializeContract: string,
@@ -13,7 +12,7 @@ export const decodeFlatUplc = (
   const decoder = toInt8Array(scriptFlat);
 
   const program = ProgramFlatCodec.decodeFlat(decoder);
-  const namedTerm = DeBruijn.fromDeBruijnTerm(program.term);
+  const namedTerm = fromDeBruijnTerm(program.term);
   const appied = new DeBruijnedProgram(version, namedTerm);
   return appied.pretty();
 };
