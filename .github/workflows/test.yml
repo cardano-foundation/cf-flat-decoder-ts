@@ -29,7 +29,10 @@ jobs:
         with:
           branches: main
           no-commit: true
-          output-folder: ./coverage
+          output-folder: ./badge
+
+      - name: 🚁 Move badge to coverage folder
+        run: mv ./badge/* ./coverage
 
       - name: 🚀 Publish coverage report to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
