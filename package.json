@@ -1,6 +1,6 @@
 {
   "name": "@cardano-foundation/cf-flat-decoder-ts",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "This package aims to offer a simple and fast method for decoding flat binary-encoded data using TypeScript and plain JavaScript, suitable for both node.js and browser",
   "author": "Cardano Foundation",
   "keywords": [
