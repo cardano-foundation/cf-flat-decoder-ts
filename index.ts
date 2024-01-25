@@ -1,18 +1,36 @@
 import { decode } from 'cbor-x';
 import { ProgramFlatCodec } from './src/uplc/codecs';
-import { hexToUint8Array, toInt8Array } from './src/uplc/utils';
-import { DeBruijnedProgram, Version, fromDeBruijnTerm } from './src/uplc/terms';
+import { DeBruijnedProgram, fromDeBruijnTerm } from './src/uplc/terms';
+import {
+  hexToUint8Array,
+  parseNestedParenthesesToObject,
+  toInt8Array,
+} from './src/uplc/utils';
 
-export const decodeFlatUplc = (
-  deserializeContract: string,
-  version: Version = { major: 2, minor: 0, patch: 0 }
-) => {
+const getDeBruijnedProgram = (
+  deserializeContract: string
+): DeBruijnedProgram => {
   const contractByteArray = hexToUint8Array(deserializeContract);
   const scriptFlat = decode(contractByteArray);
   const decoder = toInt8Array(scriptFlat);
 
   const program = ProgramFlatCodec.decodeFlat(decoder);
   const namedTerm = fromDeBruijnTerm(program.term);
-  const appied = new DeBruijnedProgram(version, namedTerm);
-  return appied.pretty();
+  const applied = new DeBruijnedProgram(program.version, namedTerm);
+  return applied;
+};
+
+export const decodeFlatUplc = (deserializeContract: string): string => {
+  const applied = getDeBruijnedProgram(deserializeContract);
+  return applied.pretty();
+};
+
+export const decodeFlatUplcToObject = (deserializeContract: string) => {
+  const applied = getDeBruijnedProgram(deserializeContract);
+  const termPretty = applied.term.pretty() || '';
+  const decodedObject = {
+    version: applied.version,
+    data: parseNestedParenthesesToObject(termPretty),
+  };
+  return decodedObject;
 };
