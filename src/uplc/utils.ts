@@ -179,3 +179,57 @@ export const bytesToHex = (bytes: Int8Array): string => {
   }
   return hexChars.join('');
 };
+
+export const removeSpacesBetweenParentheses = (str: string): string => {
+  const result = str.replace(/\(\s+|\s+\)/g, (match) => match.trim());
+
+  // keep space beetween two text
+  return result.replace(/(\w+)\s+(\w+)/g, '$1 $2');
+};
+
+const convertSquareBracketsToParentheses = (str: string): string => {
+  return str.replace(/[\[\]\n]+/g, (match) => {
+    if (match === '\n') return ''; // Remove newlines
+    return match === '[' ? '(' : ')';
+  });
+};
+
+export interface TreeNode {
+  text?: string;
+  data?: TreeNode[];
+}
+
+export const parseNestedParenthesesToObject = (str: string): TreeNode => {
+  str = removeSpacesBetweenParentheses(convertSquareBracketsToParentheses(str));
+  const stack: TreeNode[] = [];
+  let current: TreeNode | undefined;
+
+  for (const char of str) {
+    if (char === '(') {
+      const newNode: TreeNode = {};
+      if (current) {
+        if (!current.data) {
+          current.data = [];
+        }
+        current.data.push(newNode);
+        current.text = current.text?.trim();
+        if (current.text === '') {
+          delete current.text;
+        }
+        stack.push(current);
+      }
+      current = newNode;
+    } else if (char === ')') {
+      if (stack.length > 0) {
+        current = stack.pop();
+      }
+    } else {
+      if (!current) {
+        current = {};
+      }
+      current.text = (current.text || '') + char;
+    }
+  }
+
+  return current || {};
+};
