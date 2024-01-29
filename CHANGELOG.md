@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/cardano-foundation/cf-flat-decoder-ts/compare/v0.1.0...v0.1.1) (2024-01-29)
+
+
+### Features
+
+* MET-1896 add auto increament id to tree node ([f6898a8](https://github.com/cardano-foundation/cf-flat-decoder-ts/commit/f6898a8c28cd6deca7719e60eff52b98b8c7f1ee))
+* MET-1896 decode flat to object ([a96f808](https://github.com/cardano-foundation/cf-flat-decoder-ts/commit/a96f8082908db97f5f8672cbf6e26c9ad25ebd67))
+
 ## 0.1.0 (2024-01-11)
 
 
