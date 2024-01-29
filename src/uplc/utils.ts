@@ -195,6 +195,7 @@ const convertSquareBracketsToParentheses = (str: string): string => {
 };
 
 export interface TreeNode {
+  id?: number;
   text?: string;
   data?: TreeNode[];
 }
@@ -203,17 +204,18 @@ export const parseNestedParenthesesToObject = (str: string): TreeNode => {
   str = removeSpacesBetweenParentheses(convertSquareBracketsToParentheses(str));
   const stack: TreeNode[] = [];
   let current: TreeNode | undefined;
+  let autoInc = 0;
 
   for (const char of str) {
     if (char === '(') {
-      const newNode: TreeNode = {};
+      const newNode: TreeNode = { id: autoInc++ };
       if (current) {
         if (!current.data) {
           current.data = [];
         }
         current.data.push(newNode);
         current.text = current.text?.trim();
-        if (current.text === '') {
+        if (!current.text) {
           delete current.text;
         }
         stack.push(current);
@@ -225,7 +227,7 @@ export const parseNestedParenthesesToObject = (str: string): TreeNode => {
       }
     } else {
       if (!current) {
-        current = {};
+        current = { id: autoInc++ };
       }
       current.text = (current.text || '') + char;
     }
